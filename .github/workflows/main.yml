@@ -1,0 +1,24 @@
+name: Deploy the Ghost Blog to linode
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+                 
+      - name: Kubernetes set context
+        uses: Azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+          
+      - name: Kubernetes apply
+        run: |
+            kubectl apply -f ghost-volume.yaml
+            kubectl apply -f ghost-deoployment.yaml
+            kubectl apply -f ghost-lb-service.yaml
